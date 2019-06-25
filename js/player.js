@@ -66,6 +66,25 @@ class Jedi extends Player{
         this.container.material = this.containerMaterial;
     }
 
+    saberAttack(troopers){
+        if(troopers.length >= 1){
+            for(let i = 0; i < troopers.length; i++){
+                if(this.container.intersectsMesh(troopers[i].npc.container)){
+                    if(troopers[i].npc.shield === 100){
+                        troopers[i].npc.shield -= this.attackPower;
+                        console.log(`Health: ${troopers[i].npc.health} Shield: ${troopers[i].npc.shield}`);
+                        return;
+                    }
+                    if(troopers[i].npc.shield === 0 && troopers[i].npc.health === 100){
+                        troopers[i].npc.health -= this.attackPower;
+                        console.log(`Health: ${troopers[i].npc.health} Shield: ${troopers[i].npc.shield}`);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     force(start, end, loop, speed){
         this.sprite.playAnimation(start, end, loop, speed);//66, 70, true, 80
     }
@@ -120,3 +139,7 @@ class Stormtrooper extends Player{
         return spawPoint;
     }
 }
+
+// class blasterBullet(){
+//     constructor(){}
+// }

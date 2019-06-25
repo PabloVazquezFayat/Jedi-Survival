@@ -98,7 +98,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
         setInterval(()=>{
             let random = Math.round(Math.random());
-            if(random == 0 && troopers.length < 10){
+            if(random == 0 && troopers.length < 20){
                 let trooper = new Stormtrooper(100, 100, './assets/sprites/st-sprite-sheet.png', scene);
                 trooper.matchSpritePositionToContainer();
 
@@ -108,24 +108,6 @@ window.addEventListener('DOMContentLoaded', function(){
                 console.log(troopers);
             }
         }, 2000);
-
-        function engage(player, troopersArray){
-            if(troopersArray.length >= 1){
-
-                troopersArray.forEach((trooper, i)=>{
-                    if(player.container.intersectsMesh(trooper.npc.container)){
-                        if(trooper.npc.shield > 0 ){
-                            trooper.npc.shield -= luke.attackPower; 
-                        }
-                        if(trooper.npc.shield == 0){
-                            trooper.npc.health -= luke.attackPower;
-                        }
-                        console.log(`health: ${trooper.npc.health} shield: ${trooper.npc.shield}`);
-                    }
-                    //break;
-                });
-            }
-        }
 
         //REGISTER KEY INPUT EVENTS
         let inputMap = {};
@@ -147,7 +129,7 @@ window.addEventListener('DOMContentLoaded', function(){
                 luke.run(33, 39, true, 100);
                }
             }, 200);
-            engage(luke, troopers);
+            luke.saberAttack(troopers);
         }));
 
         scene.onBeforeRenderObservable.add(()=>{

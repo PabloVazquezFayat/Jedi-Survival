@@ -14,15 +14,15 @@ class FSM{
         this.npc.die(4, 5, false, 30);
 
         if(player.sprite.invertU == -1){
-            this.npc.container.position.x -= 0.5;
-            this.npc.container.position.y -= 0.5;
-            this.npc.sprite.angle += (Math.PI/16);
-        }else if(player.sprite.invertU == 0){
-            this.npc.container.position.x += 0.5;
+            this.npc.container.position.x -= 2.0;
             this.npc.container.position.y -= 0.5;
             this.npc.sprite.angle -= (Math.PI/16);
+        }else if(player.sprite.invertU == 0){
+            this.npc.container.position.x += 2.0;
+            this.npc.container.position.y -= 0.5;
+            this.npc.sprite.angle += (Math.PI/16);
         }
-
+        
         setTimeout(()=>{
             array[index].npc.container.dispose();
             array[index].npc.sprite.dispose();
@@ -63,7 +63,5 @@ class FSM{
             this.animation = false;
             this.npc.sprite.cellIndex = 6;
         }
-        
-        //check for within distance
     }
 }
