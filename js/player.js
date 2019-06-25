@@ -72,12 +72,12 @@ class Jedi extends Player{
                 if(this.container.intersectsMesh(troopers[i].npc.container)){
                     if(troopers[i].npc.shield === 100){
                         troopers[i].npc.shield -= this.attackPower;
-                        console.log(`Health: ${troopers[i].npc.health} Shield: ${troopers[i].npc.shield}`);
+                        //console.log(`Health: ${troopers[i].npc.health} Shield: ${troopers[i].npc.shield}`);
                         return;
                     }
                     if(troopers[i].npc.shield === 0 && troopers[i].npc.health === 100){
                         troopers[i].npc.health -= this.attackPower;
-                        console.log(`Health: ${troopers[i].npc.health} Shield: ${troopers[i].npc.shield}`);
+                        //console.log(`Health: ${troopers[i].npc.health} Shield: ${troopers[i].npc.shield}`);
                         return;
                     }
                 }

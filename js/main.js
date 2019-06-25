@@ -93,21 +93,18 @@ window.addEventListener('DOMContentLoaded', function(){
         luke.matchSpritePositionToContainer();
         followCamera.lockedTarget = luke.container;
 
-        //CREATE STORM-TROOPERs
+        //CREATE STORM-TROOPERS
         let troopers = [];
-
+        
         setInterval(()=>{
             let random = Math.round(Math.random());
-            if(random == 0 && troopers.length < 20){
+            if(random == 1 && troopers.length < 20){
                 let trooper = new Stormtrooper(100, 100, './assets/sprites/st-sprite-sheet.png', scene);
                 trooper.matchSpritePositionToContainer();
-
                 let npc = new FSM(trooper);
                 troopers.push(npc);
-
-                console.log(troopers);
             }
-        }, 2000);
+        }, 500);
 
         //REGISTER KEY INPUT EVENTS
         let inputMap = {};
@@ -192,17 +189,7 @@ window.addEventListener('DOMContentLoaded', function(){
                 luke.matchSpritePositionToContainer();
             }
 
-        });
-
-
-        scene.onBeforeRenderObservable.add(()=>{
-            if(inputMap['w']){
-                luke.jump();
-            }
-        });
-
-        scene.onBeforeRenderObservable.add(()=>{
-            //engage(luke, troopers);
+            //KILL AND REMOVE STOORMTROOPERS FROM SCENE
             troopers.forEach((trooper, i)=>{
                 let random = Math.round(Math.random());
                 trooper.npcMove(luke.container.position.x, random);
@@ -211,6 +198,14 @@ window.addEventListener('DOMContentLoaded', function(){
                     trooper.npcDie(luke, troopers, i);
                 }
             });
+
+        });
+
+
+        scene.onBeforeRenderObservable.add(()=>{
+            if(inputMap['w']){
+                luke.jump();
+            }
         });
 
         return scene;

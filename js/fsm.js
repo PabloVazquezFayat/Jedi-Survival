@@ -2,6 +2,7 @@ class FSM{
     constructor(npc){
         this.npc = npc;
         this.animation = false;
+        this.random = Math.round(Math.random());
     }
     
     npcAttack(){
@@ -13,23 +14,35 @@ class FSM{
     npcDie(player, array, index){
         this.npc.die(4, 5, false, 30);
 
-        if(player.sprite.invertU == -1){
-            this.npc.container.position.x -= 2.0;
-            this.npc.container.position.y -= 0.5;
-            this.npc.sprite.angle -= (Math.PI/16);
-        }else if(player.sprite.invertU == 0){
-            this.npc.container.position.x += 2.0;
-            this.npc.container.position.y -= 0.5;
-            this.npc.sprite.angle += (Math.PI/16);
+        if(this.random == 0){
+            if(player.sprite.invertU == -1){
+                this.npc.container.position.x -= 2.0;
+                this.npc.container.position.y -= 0.5;
+                this.npc.sprite.angle -= (Math.PI/16);
+            }else if(player.sprite.invertU == 0){
+                this.npc.container.position.x += 2.0;
+                this.npc.container.position.y -= 0.5;
+                this.npc.sprite.angle += (Math.PI/16);
+            }
+        }else{
+            if(player.sprite.invertU == -1){
+                this.npc.container.position.x += 2.0;
+                this.npc.container.position.y += 0.5;
+                this.npc.sprite.angle -= (Math.PI/16);
+            }else if(player.sprite.invertU == 0){
+                this.npc.container.position.x -= 2.0;
+                this.npc.container.position.y += 0.5;
+                this.npc.sprite.angle += (Math.PI/16);
+            }
         }
         
-        setTimeout(()=>{
+        if(this.npc.container.position.y < -500){
             array[index].npc.container.dispose();
             array[index].npc.sprite.dispose();
             array[index].npc.spriteManager.dispose();
             array[index].npc.containerMaterial.dispose();
             array.splice(index, 1);
-        }, 500);
+        }
     }
 
     npcMove(playerX, chase){
