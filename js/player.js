@@ -4,6 +4,7 @@ class Player{
         this.health = health;
         this.shield = shield;
         this.attackPower = 100;
+        this.gravityVector = 2.75;
     }
 
     matchSpritePositionToContainer(){
@@ -45,9 +46,11 @@ class Jedi extends Player{
         this.forcePower = 100;
         this.health = health;
         this.shield = shield;
+        this.maxJumpHeight = 25;
+        this.jumping = false;
         this.scene = scene;
         this.attackPower = 100;
-        this.vectors = {x: 40, y: 11, z: -2.5};
+        this.vectors = {x: 250, y: 11, z: -2.5};
         this.spritePath = spritePath;
         this.spriteManager = new BABYLON.SpriteManager('player-manager', this.spritePath, 112, 112, this.scene);
         this.sprite = new BABYLON.Sprite('player', this.spriteManager);
@@ -71,6 +74,21 @@ class Jedi extends Player{
         this.sprite.playAnimation(start, end, loop, speed);//4, 5, false, 100
         return true;
     }
+
+    jump(start, end, loop, speed){
+        if(this.container.position.y < 22){
+            this.container.position.y += 11;
+            this.sprite.playAnimation(44, 46, false, 100);
+            this.matchSpritePositionToContainer();
+            this.jumping = true;
+        }
+        if(this.jumping == true && this.container.position.y > 11){
+            this.container.position.y -= 11;
+        }
+        if(this.container.position.y === 11){
+            this.jumping = false;
+        }
+    }
 }
 
 class Stormtrooper extends Player{
@@ -80,15 +98,16 @@ class Stormtrooper extends Player{
         this.health = health;
         this.shield = shield;
         this.scene = scene;
+        this.speed = 0.5;
         this.vectors = {x: 40, y: 11, z: -2.5};
         this.spritePath = spritePath;
-        this.spriteManager = new BABYLON.SpriteManager('player-manager', this.spritePath, 112, 112, this.scene);
+        this.spriteManager = new BABYLON.SpriteManager('trooper-manager', this.spritePath, 112, 112, this.scene);
         this.sprite = new BABYLON.Sprite('player', this.spriteManager);
         this.sprite.width = 15;
         this.sprite.height = 15;
         this.sprite.cellIndex = 0;
         this.sprite.position = new BABYLON.Vector3(this.vectorX, this.vectorY+3, this.vectorZ);
-        this.container = new BABYLON.MeshBuilder.CreateBox('player-container', {height: 10, width: 10}, this.scene);
+        this.container = new BABYLON.MeshBuilder.CreateBox('trooper-container', {height: 10, width: 10}, this.scene);
         this.container.position = new BABYLON.Vector3(this.spawn(), this.vectors.y, this.vectors.z);
         this.containerMaterial = new BABYLON.StandardMaterial('player-container', this.scene);
         this.containerMaterial.wireframe = true;
@@ -97,7 +116,7 @@ class Stormtrooper extends Player{
     }
 
     spawn(){
-        let spawPoint = Math.floor(Math.random() * 100) + 10; 
+        let spawPoint = Math.floor(Math.random() * 500) + 10; 
         return spawPoint;
     }
 }

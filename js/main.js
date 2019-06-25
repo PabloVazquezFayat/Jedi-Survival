@@ -8,7 +8,7 @@ window.addEventListener('DOMContentLoaded', function(){
         let scene = new BABYLON.Scene(engine);
         scene.ambientColor = new BABYLON.Color3(1, 1, 1);
 
-        let gravityVector = new BABYLON.Vector3(0,-9.81, 0);
+        let gravityVector = new BABYLON.Vector3(0, -10.0, 0);
         let physicsPlugin = new BABYLON.CannonJSPlugin();
         scene.enablePhysics(gravityVector, physicsPlugin);
 
@@ -77,8 +77,8 @@ window.addEventListener('DOMContentLoaded', function(){
         ground.material = groundMaterial;
 
         //WORLD BACKGROUND PLANE/IMAGE
-        let background = BABYLON.MeshBuilder.CreatePlane('dunes', {width: 500, height: 137, tileSize: 1}, scene);
-        background.position = new BABYLON.Vector3(250, 68.50, 0);
+        let background = BABYLON.MeshBuilder.CreatePlane('dunes', {width: 500, height: 165, tileSize: 1}, scene);
+        background.position = new BABYLON.Vector3(250, 58, 0);//68.50
 
         //WORLD BACKGROUND IMAGE/MATERIAL/TEXTURE
         let backGroundMaterial = new BABYLON.StandardMaterial('dune-sea', scene);
@@ -93,14 +93,44 @@ window.addEventListener('DOMContentLoaded', function(){
         luke.matchSpritePositionToContainer();
         followCamera.lockedTarget = luke.container;
 
-        //CREATE STORM-TROOPERS
-        let trooper = new Stormtrooper(100, 100, './assets/sprites/st-sprite-sheet.png', scene);
-        trooper.matchSpritePositionToContainer();
+        //CREATE STORM-TROOPERs
+        let troopers = [];
 
-        let npc = new FSM(trooper);
+        setInterval(()=>{
+            let random = Math.round(Math.random());
+            if(random == 0 && troopers.length < 10){
+                let trooper = new Stormtrooper(100, 100, './assets/sprites/st-sprite-sheet.png', scene);
+                trooper.matchSpritePositionToContainer();
+
+                let npc = new FSM(trooper);
+                troopers.push(npc);
+
+                console.log(troopers);
+            }
+        }, 2000);
+
+        function engage(player, troopersArray){
+            if(troopersArray.length >= 1){
+
+                troopersArray.forEach((trooper, i)=>{
+                    if(player.container.intersectsMesh(trooper.npc.container)){
+                        if(trooper.npc.shield > 0 ){
+                            trooper.npc.shield -= luke.attackPower; 
+                        }
+                        if(trooper.npc.shield == 0){
+                            trooper.npc.health -= luke.attackPower;
+                        }
+                        console.log(`health: ${trooper.npc.health} shield: ${trooper.npc.shield}`);
+                    }
+                    //break;
+                });
+            }
+        }
 
         //REGISTER KEY INPUT EVENTS
-        let inputMap =[];
+        let inputMap = {};
+        let animating = false;
+
         scene.actionManager = new BABYLON.ActionManager(scene);
         scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyDownTrigger, (evt)=>{								
             inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
@@ -108,22 +138,24 @@ window.addEventListener('DOMContentLoaded', function(){
         scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnKeyUpTrigger, (evt)=>{								
             inputMap[evt.sourceEvent.key] = evt.sourceEvent.type == "keydown";
         }));
-
-        let animating = false;
-
-        setInterval(()=>{
-            let random = Math.round(Math.random());
-            if(random = 1){
-                npc.npcAttack();
-            }
-        }, 1000);
+        scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction({trigger: BABYLON.ActionManager.OnKeyUpTrigger, parameter: 'l'}, (evt)=>{
+            luke.attack(66, 70, false, 30);
+            setTimeout(()=>{
+               if(!animating){
+                luke.block(4, 5, false, 50);
+               }else{
+                luke.run(33, 39, true, 100);
+               }
+            }, 200);
+            engage(luke, troopers);
+        }));
 
         scene.onBeforeRenderObservable.add(()=>{
 
             let keydown = false;
 
             if(inputMap["d"] || inputMap["ArrowRight"]){
-                luke.container.position.x += 0.5;
+                luke.container.position.x += 1.0;
                 luke.matchSpritePositionToContainer();
                 luke.turn(0);
                 keydown=true;
@@ -134,20 +166,12 @@ window.addEventListener('DOMContentLoaded', function(){
             }
 
             if(inputMap["a"] || inputMap["ArrowLeft"]){
-                luke.container.position.x -= 0.5;
+                luke.container.position.x -= 1.0;
                 luke.matchSpritePositionToContainer();
                 luke.turn(-1);
                 keydown=true;
                 if(keydown == true && animating == false){
                     luke.run(33, 39, true, 100);
-                    animating = true;
-                }
-            }
-
-            if(inputMap["l"]){
-                keydown=true;
-                if(keydown == true && animating == false){
-                    luke.attack(66, 70, true, 80);
                     animating = true;
                 }
             }
@@ -174,15 +198,37 @@ window.addEventListener('DOMContentLoaded', function(){
                 luke.matchSpritePositionToContainer();
                 animating = false;
             }
+
+            //PLAYER BOUNDARIES 
+            if(luke.container.position.x >= 450){
+                luke.container.position.x = 450;
+                luke.matchSpritePositionToContainer();
+            }
+
+            if(luke.container.position.x <= 50){
+                luke.container.position.x = 50;
+                luke.matchSpritePositionToContainer();
+            }
+
         });
 
-        let fsmAnimating = false;
 
         scene.onBeforeRenderObservable.add(()=>{
-            let random = Math.round(Math.random());
-            if(random == 0){
-                npc.npcMove(luke.container.position.x);
+            if(inputMap['w']){
+                luke.jump();
             }
+        });
+
+        scene.onBeforeRenderObservable.add(()=>{
+            //engage(luke, troopers);
+            troopers.forEach((trooper, i)=>{
+                let random = Math.round(Math.random());
+                trooper.npcMove(luke.container.position.x, random);
+
+                if(trooper.npc.health <= 0){
+                    trooper.npcDie(luke, troopers, i);
+                }
+            });
         });
 
         return scene;
