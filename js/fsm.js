@@ -31,7 +31,7 @@ class FSM{
             }
         }
         
-        if(this.npc.container.position.y < -10 || this.npc.container.position.y > 100){
+        if(this.npc.container.position.y < -10 || this.npc.container.position.y > 20){
             array[index].npc.container.dispose();
             array[index].npc.sprite.dispose();
             array[index].npc.spriteManager.dispose();

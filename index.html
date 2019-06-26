@@ -15,10 +15,58 @@
     <script src="js/fsm.js"></script>
 </head>
 <body>
-    <div>
-        <h1>Jedi Survival</h1>
-        <button>Begin</button>
+    <div id="game-screen">
+        <div class="intro">
+            <img src="imgs/crest.png">
+            <h1>Jedi Survival</h1>
+            <h2>Welcome to The Dune Sea, or as we like to call it, The Doom Sea...</h2>
+            <p>Objective: Survive!!! For as long as you can.</p>
+            <h3>Description:</h3>
+            <p>
+                Stormtroopers are hunting you down, there is no escape, just keep
+                Iron-hacking away for as long as you can.
+            </p>
+            <div class="controls-container">
+                <div class="keys-container">
+                    <div class="key-container">
+                        <p>Run-left</p>
+                        <div class='key' id="a-key">A</div>
+                    </div>
+                    <div class="key-container">
+                        <p>Run-right</p>
+                        <div class='key' id="d-key">D</div>
+                    </div>
+                </div>
+                <div class="keys-container">
+                    <div class="key-container">
+                        <p>Saber-Attack</p>
+                        <div class='key' id="l-key">L</div>
+                    </div>
+                    <div class="key-container">
+                        <p>Saber-Block</p>
+                        <div class='key' id="m-key">M</div>
+                    </div>
+                    <div class="key-container">
+                        <p>Force-Push</p>
+                        <div class='key' id="k-key">K</div>
+                    </div>
+                </div>
+            </div>
+            <div class="start-button">
+                <button id="start">START</button>
+            </div>
+        </div>
+        <div class="stars"></div>
+        <div class="twinkling"></div>
     </div>
+    <div class="stat-bars">
+        <label>Health</label>
+        <progress id="Health" value="400" max="400"></progress>
+        <label>Force</label>
+        <progress id="Force" value="400" max="400"></progress> 
+        <div class="timer" >Timer: <span id="mins">0</span> : <span id="secs">0</span> </div>
+    </div>
+    <div id="game-over">game over jedi</div>
     <canvas id="renderCanvas"></canvas>
 </body>
 </html>

@@ -48,6 +48,8 @@ class Jedi extends Player{
         this.shield = shield;
         this.maxJumpHeight = 25;
         this.jumping = false;
+        this.blocking = false;
+        this.slashing = false;
         this.scene = scene;
         this.attackPower = 100;
         this.vectors = {x: 250, y: 11, z: -2.5};
@@ -61,8 +63,8 @@ class Jedi extends Player{
         this.container = new BABYLON.MeshBuilder.CreateBox('player-container', {height: 10, width: 5}, this.scene);
         this.container.position = new BABYLON.Vector3(this.vectors.x, this.vectors.y, this.vectors.z);
         this.containerMaterial = new BABYLON.StandardMaterial('player-container', this.scene);
-        this.containerMaterial.wireframe = true;
-        this.containerMaterial.alpha = 1;
+        this.containerMaterial.wireframe = false;
+        this.containerMaterial.alpha = 0;
         this.container.material = this.containerMaterial;
     }
 
@@ -88,6 +90,10 @@ class Jedi extends Player{
     force(start, end, loop, speed){
         this.sprite.playAnimation(start, end, loop, speed);//66, 70, true, 80
     }
+
+    // forcePush(troopers, bolts){
+
+    // }
 
     block(start, end, loop, speed){
         this.sprite.playAnimation(start, end, loop, speed);//4, 5, false, 100
@@ -129,21 +135,14 @@ class Stormtrooper extends Player{
         this.container = new BABYLON.MeshBuilder.CreateBox('trooper-container', {height: 10, width: 10}, this.scene);
         this.container.position = new BABYLON.Vector3(this.spawn(), this.vectors.y, this.vectors.z);
         this.containerMaterial = new BABYLON.StandardMaterial('player-container', this.scene);
-        this.containerMaterial.wireframe = true;
-        this.containerMaterial.alpha = 1;
+        this.containerMaterial.wireframe = false;
+        this.containerMaterial.alpha = 0;
         this.container.material = this.containerMaterial;
     }
 
     spawn(){
         let spawPoint = Math.floor(Math.random() * 500) + 10; 
         return spawPoint;
-    }
-
-    blasterFire(player){
-        //from trooper position
-        //create bolt
-        //send bolt towards player
-        //if bolt distance from starting point is greater than 100 destroy bolt
     }
 }
 
@@ -161,30 +160,43 @@ class Bolt{
         this.container = new BABYLON.MeshBuilder.CreateBox('bolt', {height: 2, width: 7}, this.scene);
         this.container.position = new BABYLON.Vector3(this.trooper.npc.container.position.x, 11.78, -2.5);
         this.containerMaterial = new BABYLON.StandardMaterial('bolt-container', this.scene);
-        this.containerMaterial.wireframe = true;
-        this.containerMaterial.alpha = 1;
+        this.containerMaterial.wireframe = false;
+        this.containerMaterial.alpha = 0;
         this.container.material = this.containerMaterial;
     }
 
     boltDirectionTrajectory(player){
         if(player.container.position.x < this.container.position.x){
-            this.container.position.x -= 2;
+            this.container.position.x -= 0.75;
             this.matchSpritePositionToContainer();
             return this.container.position.x;
         }
 
         if(player.container.position.x > this.container.position.x){
-            this.container.position.x += 2;
+            this.container.position.x += 0.75;
             this.matchSpritePositionToContainer();
             return this.container.position.x;
         }
     }
 
     hit(player){
-        if(this.container.intersectsMesh(player.container)){
-            player.health -= this.power;
-            console.log(player.health);
+        if(this.container.intersectsMesh(player.container) && player.blocking == true){
+            
+            if(player.health < 400){
+                player.health += 25;
+            }
             return true;
+        }
+        if(this.container.intersectsMesh(player.container)){
+            if(player.shield > 0){
+                player.shield -= this.power;
+                return true;
+            }
+
+            if(player.shield == 0 && player.health > 0){
+                player.health -= this.power;
+                return true;
+            }
         }
     }
 
@@ -208,3 +220,10 @@ class Bolt{
         player.health -= this.power;
     }
 }
+
+// class forcePush{
+//     constructor(){
+
+//     }
+
+// }

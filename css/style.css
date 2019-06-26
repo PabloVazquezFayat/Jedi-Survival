@@ -1,3 +1,12 @@
+@font-face{
+    font-family:star jedi;
+    font-style:normal;
+    font-weight:400;
+    src:local('Star Jedi'),local('StarJedi-Regular'),
+    url(../font/star-jedi_108a0c1f596b5c0a80628b4566a9f336.woff) format('woff'),
+    url(../font/star-jedi_[allfont.net].ttf) format('truetype');
+};
+
 *{
     padding: 0px;
     margin: 0px;
@@ -11,8 +20,225 @@ html, body {
     padding : 0;
 }
 
+.stat-bars{
+    width: 300px;
+    height: 100px;
+    margin: 20px 0px 0px 20px;
+    position: fixed;
+    z-index: 9999;
+}
+
+.stat-bars label{
+    font-family: 'Star Jedi';
+    padding: 0px;
+    margin: 0px;
+    color: White;;
+}
+
+progress::-moz-progress-bar { 
+    background: white; 
+}
+
+#Health{
+    background: red;
+    width: 98%;
+    padding: 0px;
+    margin: 0px;
+}
+
+#Force{
+    background: red;
+    width: 98%;
+    padding: 0px;
+    margin: 0px;
+}
+
+.timer{
+    font-family: 'Star Jedi';
+    color: white;
+    margin: 5px 0px 0px 0px;
+ }
+
+ .timer span{
+     margin: 0px;
+     padding: 0px;
+ }
+
 #renderCanvas {
     width   : 100%;
     height  : 100%;
     touch-action: none;
+}
+
+#game-screen{
+    background: black;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+.intro{
+    width: 600px;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    border: solid 3px #FFD700;
+    border-radius: 5px;
+}
+
+h1{
+    font-family: 'star jedi';
+    font-size: 48px;
+    text-align: center;
+    color: #FFD700;
+    margin: 0px 0px 20px 0px;
+    padding: 0px;
+}
+
+img{
+    width: 100px;
+    height: auto;
+    margin: 0px 0px 10px 0px;
+}
+
+h2, h3, p{ 
+    width: 80%;
+    font-family: 'helvetica';/*'Franklin Gothic'; */
+    font-size: 18px;
+    text-align: left;
+    font-weight: 100;
+    color: #4ad4ed;
+    margin: 0px 0px 10px 0px;
+    padding: 0px;
+}
+
+.controls-container{
+    width: 90%;
+    margin: 20px 0px 0px 0px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.keys-container{
+    width: auto;
+    float: left;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.key-container{
+    width: 90px;
+    margin: 1px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.key-container p{
+    font-size: 12px;
+    text-align: center;
+}
+
+.key{
+    width: 65px;
+    padding: 12px 0px;
+    margin: 0px 10px;
+    border: solid 3px #4ad4ed;
+    border-radius: 5px;
+    text-align: center;
+    color: #4ad4ed;
+}
+
+.start-button{
+    width: 90%;
+    margin: 30px 0px 0px 0px;
+    display: flex;
+    justify-content: center;
+}
+
+#start{
+    background: none;
+    width: 150px;
+    height: 50px;
+    border: solid 3px #FFD700;
+    border-radius: 5px;
+    font-size: 20px;
+    font-family: 'Star Jedi';
+    color: #FFD700;
+}
+
+#start:hover{
+    background: #4ad4ed;
+    border: solid 3px #4ad4ed;
+    color: white;
+    cursor: pointer;
+}
+
+/* ANIMATED STARS BACKGROUND */
+@keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+@-webkit-keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+@-moz-keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+@-ms-keyframes move-twink-back {
+    from {background-position:0 0;}
+    to {background-position:-10000px 5000px;}
+}
+
+.stars, .twinkling{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.stars {
+  background:#000 url(http://www.script-tutorials.com/demos/360/images/stars.png) repeat top center;
+  z-index:0;
+}
+
+.twinkling{
+  background:transparent url(http://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center;
+  z-index:1;
+
+  -moz-animation:move-twink-back 200s linear infinite;
+  -ms-animation:move-twink-back 200s linear infinite;
+  -o-animation:move-twink-back 200s linear infinite;
+  -webkit-animation:move-twink-back 200s linear infinite;
+  animation:move-twink-back 200s linear infinite;
+}
+
+#game-over{
+    width: 400px;
+    padding: 30px;
+    font-family: 'Star Jedi';
+    font-size: 38px;
+    color: #FFD700;
+    border: solid 3px #FFD700;
+    border-radius: 5px;
+    z-index: 9999;
+    position: fixed;
+    left: 35%;
+    top: 35%;
+    display: none;
 }
