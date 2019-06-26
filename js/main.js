@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', function(){
         scene.enablePhysics();
         scene.collisionsEnabled = true;
 
-        //scene.debugLayer.show();
+        // scene.debugLayer.show();
 
         function showWorldAxis(size) {
             var makeTextPlane = function(text, color, size) {
@@ -93,18 +93,39 @@ window.addEventListener('DOMContentLoaded', function(){
         luke.matchSpritePositionToContainer();
         followCamera.lockedTarget = luke.container;
 
+        let trooper = new Stormtrooper(100, 100, './assets/sprites/st-sprite-sheet.png', scene);
+        trooper.matchSpritePositionToContainer();
+        let npc = new FSM(trooper, scene);
+
+        let troopers = [npc];
+
+        console.log(troopers[0].npc.container.position.x);
+
         //CREATE STORM-TROOPERS
-        let troopers = [];
-        
+        // let troopers = [];
+
+        // setInterval(()=>{
+        //     let random = Math.round(Math.random());
+        //     if(random == 1 && troopers.length < 20){
+        //         let trooper = new Stormtrooper(100, 100, './assets/sprites/st-sprite-sheet.png', scene);
+        //         trooper.matchSpritePositionToContainer();
+        //         let npc = new FSM(trooper);
+        //         troopers.push(npc);
+        //         console.log(troopers);
+        //     }
+        // }, 500);
+
+        let bolts = [];
+
         setInterval(()=>{
-            let random = Math.round(Math.random());
-            if(random == 1 && troopers.length < 20){
-                let trooper = new Stormtrooper(100, 100, './assets/sprites/st-sprite-sheet.png', scene);
-                trooper.matchSpritePositionToContainer();
-                let npc = new FSM(trooper);
-                troopers.push(npc);
+            let boltOrDud = Math.round(Math.random()*10);
+            if(boltOrDud == 0){
+                bolt = new Bolt(troopers[0], "./assets/sprites/blaster-bolt.png", scene);//troopers[Math.floor(Math.random() * myArray.length)];
+                bolt.matchSpritePositionToContainer();
+                bolts.push(bolt);
+                console.log('bullet made');
             }
-        }, 500);
+        }, 100);
 
         //REGISTER KEY INPUT EVENTS
         let inputMap = {};
@@ -197,6 +218,12 @@ window.addEventListener('DOMContentLoaded', function(){
                 if(trooper.npc.health <= 0){
                     trooper.npcDie(luke, troopers, i);
                 }
+            });
+
+            bolts.forEach((bolt, i)=>{
+                bolt.boltDirectionTrajectory(luke);
+                let hit =  bolt.hit(luke);
+                bolt.destroy(hit, bolts, i);
             });
 
         });

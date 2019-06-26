@@ -1,14 +1,9 @@
 class FSM{
-    constructor(npc){
+    constructor(npc, scene){
         this.npc = npc;
+        this.scene = scene;
         this.animation = false;
         this.random = Math.round(Math.random());
-    }
-    
-    npcAttack(){
-        if(this.animation == false){
-            this.npc.attack(6, 6, false, 100);
-        }
     }
 
     npcDie(player, array, index){
@@ -26,17 +21,17 @@ class FSM{
             }
         }else{
             if(player.sprite.invertU == -1){
-                this.npc.container.position.x += 2.0;
+                this.npc.container.position.x -= 2.0;
                 this.npc.container.position.y += 0.5;
                 this.npc.sprite.angle -= (Math.PI/16);
             }else if(player.sprite.invertU == 0){
-                this.npc.container.position.x -= 2.0;
+                this.npc.container.position.x += 2.0;
                 this.npc.container.position.y += 0.5;
                 this.npc.sprite.angle += (Math.PI/16);
             }
         }
         
-        if(this.npc.container.position.y < -500){
+        if(this.npc.container.position.y < -10 || this.npc.container.position.y > 100){
             array[index].npc.container.dispose();
             array[index].npc.sprite.dispose();
             array[index].npc.spriteManager.dispose();

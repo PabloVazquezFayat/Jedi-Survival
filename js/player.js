@@ -58,7 +58,7 @@ class Jedi extends Player{
         this.sprite.height = 15;
         this.sprite.cellIndex = 0;
         this.sprite.position = new BABYLON.Vector3(this.vectorX, this.vectorY+3, this.vectorZ);
-        this.container = new BABYLON.MeshBuilder.CreateBox('player-container', {height: 10, width: 10}, this.scene);
+        this.container = new BABYLON.MeshBuilder.CreateBox('player-container', {height: 10, width: 5}, this.scene);
         this.container.position = new BABYLON.Vector3(this.vectors.x, this.vectors.y, this.vectors.z);
         this.containerMaterial = new BABYLON.StandardMaterial('player-container', this.scene);
         this.containerMaterial.wireframe = true;
@@ -138,8 +138,73 @@ class Stormtrooper extends Player{
         let spawPoint = Math.floor(Math.random() * 500) + 10; 
         return spawPoint;
     }
+
+    blasterFire(player){
+        //from trooper position
+        //create bolt
+        //send bolt towards player
+        //if bolt distance from starting point is greater than 100 destroy bolt
+    }
 }
 
-// class blasterBullet(){
-//     constructor(){}
-// }
+class Bolt{
+    constructor(trooper, spritePath, scene){
+        this.scene = scene;
+        this.trooper = trooper;
+        this.power = 50;
+        this.spritePath = spritePath;
+        this.spriteManager = new BABYLON.SpriteManager('bolt-manager', this.spritePath, 100, 100, this.scene);
+        this.sprite = new BABYLON.Sprite('bolt', this.spriteManager);
+        this.sprite.width = 15;
+        this.sprite.height = 15;
+        this.sprite.cellIndex = 0;
+        this.container = new BABYLON.MeshBuilder.CreateBox('bolt', {height: 2, width: 7}, this.scene);
+        this.container.position = new BABYLON.Vector3(this.trooper.npc.container.position.x, 11.78, -2.5);
+        this.containerMaterial = new BABYLON.StandardMaterial('bolt-container', this.scene);
+        this.containerMaterial.wireframe = true;
+        this.containerMaterial.alpha = 1;
+        this.container.material = this.containerMaterial;
+    }
+
+    boltDirectionTrajectory(player){
+        if(player.container.position.x < this.container.position.x){
+            this.container.position.x -= 2;
+            this.matchSpritePositionToContainer();
+            return this.container.position.x;
+        }
+
+        if(player.container.position.x > this.container.position.x){
+            this.container.position.x += 2;
+            this.matchSpritePositionToContainer();
+            return this.container.position.x;
+        }
+    }
+
+    hit(player){
+        if(this.container.intersectsMesh(player.container)){
+            player.health -= this.power;
+            console.log(player.health);
+            return true;
+        }
+    }
+
+    destroy(hit, boltsArray, index){
+        if(hit){
+            boltsArray[index].container.dispose();
+            boltsArray[index].sprite.dispose();
+            boltsArray[index].spriteManager.dispose();
+            boltsArray[index].containerMaterial.dispose();
+            boltsArray.splice(index, 1);
+        }
+    }
+
+    matchSpritePositionToContainer(){
+        this.sprite.position.x = this.container.position.x;
+        this.sprite.position.y = this.container.position.y;
+        this.sprite.position.z = this.container.position.z;
+    }
+
+    damage(player){
+        player.health -= this.power;
+    }
+}
