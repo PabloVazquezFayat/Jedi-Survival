@@ -64,8 +64,8 @@ class Jedi extends Player{
         this.container = new BABYLON.MeshBuilder.CreateBox('player-container', {height: 10, width: 5}, this.scene);
         this.container.position = new BABYLON.Vector3(this.vectors.x, this.vectors.y, this.vectors.z);
         this.containerMaterial = new BABYLON.StandardMaterial('player-container', this.scene);
-        this.containerMaterial.wireframe = false;
-        this.containerMaterial.alpha = 0;
+        this.containerMaterial.wireframe = true;
+        this.containerMaterial.alpha = 1;
         this.container.material = this.containerMaterial;
     }
 
@@ -104,18 +104,8 @@ class Jedi extends Player{
     }
 
     jump(start, end, loop, speed){
-        if(this.container.position.y < 22){
-            this.container.position.y += 11;
-            this.sprite.playAnimation(44, 46, false, 100);
-            this.matchSpritePositionToContainer();
-            this.jumping = true;
-        }
-        if(this.jumping == true && this.container.position.y > 11){
-            this.container.position.y -= 11;
-        }
-        if(this.container.position.y === 11){
-            this.jumping = false;
-        }
+        this.sprite.playAnimation(start, end, loop, speed);
+        this.matchSpritePositionToContainer();
     }
 }
 

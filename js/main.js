@@ -237,6 +237,43 @@ window.addEventListener('DOMContentLoaded', function(){
                     luke.forcePushWaveCreate();
                 }
             }));
+            //FORCE PUSH BIND TO KEY 'W' AND FIRE
+            let doOnce = false;
+            scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction({trigger: BABYLON.ActionManager.OnKeyUpTrigger, parameter: 'w'}, (evt)=>{
+                doOnce = false;
+                if(luke.health > 0){
+                    luke.jump(44, 54, false, 50);
+                    luke.blocking = true;
+                    setTimeout(()=>{
+                        if(!animating){
+                            luke.idle(0, 3, true, 500);
+                            luke.blocking = false;
+                        }else{
+                            luke.run(33, 39, true, 100);
+                            luke.blocking = false;
+                        }
+                    }, 400);
+                    let timer = setInterval(()=>{
+                        if(luke.container.position.y < 25 && luke.jumping == false){
+                            luke.container.position.y += 1;
+                            luke.matchSpritePositionToContainer();
+                        }
+                        if(luke.container.position.y  == 25){
+                            luke.jumping = true;
+                        }
+                        if(luke.jumping == true && luke.container.position.y > 11){
+                            luke.container.position.y -= 1;
+                            luke.matchSpritePositionToContainer();
+                        }
+                        if(luke.container.position.y == 11){
+                            luke.jumping = false;
+                            clearInterval(timer);
+                        }
+                    }, 20);
+                    
+                    //luke.jump(44, 54, false, 300);
+                }
+            }));
     
             scene.onBeforeRenderObservable.add(()=>{
     
