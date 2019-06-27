@@ -7,7 +7,16 @@ class FSM{
     }
 
     npcDie(player, array, index){
-        this.npc.die(4, 5, false, 30);
+        
+        
+        // if(this.npc.causeOfDeath == 1){
+        //     this.npc.die(10, 15, false, 100);
+
+        // }
+
+        // if(this.npc.causeOfDeath == 0){
+        //     this.npc.die(4, 5, false, 50);
+        // }
 
         if(this.random == 0){
             if(player.sprite.invertU == -1){

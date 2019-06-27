@@ -50,6 +50,7 @@ class Jedi extends Player{
         this.jumping = false;
         this.blocking = false;
         this.slashing = false;
+        this.pushWave = {};
         this.scene = scene;
         this.attackPower = 100;
         this.vectors = {x: 250, y: 11, z: -2.5};
@@ -74,26 +75,28 @@ class Jedi extends Player{
                 if(this.container.intersectsMesh(troopers[i].npc.container)){
                     if(troopers[i].npc.shield === 100){
                         troopers[i].npc.shield -= this.attackPower;
-                        //console.log(`Health: ${troopers[i].npc.health} Shield: ${troopers[i].npc.shield}`);
                         return;
                     }
                     if(troopers[i].npc.shield === 0 && troopers[i].npc.health === 100){
                         troopers[i].npc.health -= this.attackPower;
-                        //console.log(`Health: ${troopers[i].npc.health} Shield: ${troopers[i].npc.shield}`);
+                        troopers[i].npc.causeOfDeath = 0;
                         return;
                     }
                 }
             }
         }
     }
+    
+    forcePushWaveCreate(){
+        //CREATE FORCE PUSH WAVE
+        this.pushWave = new PushWave(400, this.container.position.x, "./assets/sprites/force-push.png", this.scene);
+        this.pushWave.matchSpritePositionToContainer();
+        this.pushWave.direction = this.sprite.invertU;
+    }
 
     force(start, end, loop, speed){
         this.sprite.playAnimation(start, end, loop, speed);//66, 70, true, 80
     }
-
-    // forcePush(troopers, bolts){
-
-    // }
 
     block(start, end, loop, speed){
         this.sprite.playAnimation(start, end, loop, speed);//4, 5, false, 100
@@ -119,7 +122,6 @@ class Jedi extends Player{
 class Stormtrooper extends Player{
     constructor(health, shield, spritePath, scene){
         super(health, shield, spritePath, scene);
-        this.forcePower = 100;
         this.health = health;
         this.shield = shield;
         this.scene = scene;
@@ -138,6 +140,7 @@ class Stormtrooper extends Player{
         this.containerMaterial.wireframe = false;
         this.containerMaterial.alpha = 0;
         this.container.material = this.containerMaterial;
+        this.causeOfDeath = 0;
     }
 
     spawn(){
@@ -147,10 +150,10 @@ class Stormtrooper extends Player{
 }
 
 class Bolt{
-    constructor(trooper, spritePath, scene){
+    constructor(power, emitterPosition, spritePath, scene){
         this.scene = scene;
-        this.trooper = trooper;
-        this.power = 50;
+        this.power = power;
+        this.emitterPosition = emitterPosition;
         this.spritePath = spritePath;
         this.spriteManager = new BABYLON.SpriteManager('bolt-manager', this.spritePath, 100, 100, this.scene);
         this.sprite = new BABYLON.Sprite('bolt', this.spriteManager);
@@ -158,7 +161,7 @@ class Bolt{
         this.sprite.height = 15;
         this.sprite.cellIndex = 0;
         this.container = new BABYLON.MeshBuilder.CreateBox('bolt', {height: 2, width: 7}, this.scene);
-        this.container.position = new BABYLON.Vector3(this.trooper.npc.container.position.x, 11.78, -2.5);
+        this.container.position = new BABYLON.Vector3(this.emitterPosition, 11.78, -2.5);
         this.containerMaterial = new BABYLON.StandardMaterial('bolt-container', this.scene);
         this.containerMaterial.wireframe = false;
         this.containerMaterial.alpha = 0;
@@ -166,6 +169,7 @@ class Bolt{
     }
 
     boltDirectionTrajectory(player){
+            
         if(player.container.position.x < this.container.position.x){
             this.container.position.x -= 0.75;
             this.matchSpritePositionToContainer();
@@ -221,9 +225,78 @@ class Bolt{
     }
 }
 
-// class forcePush{
-//     constructor(){
+class PushWave extends Bolt{
+    constructor(power, emitterPosition, spritePath, scene){
+        super(power, emitterPosition, spritePath, scene);
+    }
 
-//     }
+    pushWaveDirectionTrajectory(player){
+        
+        if(this.direction == -1){
+            this.container.position.x -= 1.5;
+            this.matchSpritePositionToContainer();
+            this.sprite.invertU = -1;
+            return;
+        }
 
-// }
+        if(this.direction == 0){
+            this.container.position.x += 1.5;
+            this.matchSpritePositionToContainer();
+            this.sprite.invertU = 0;
+            return;
+        }
+
+    }
+
+    pushWaveCheckCollions(troopers, bolts, player){
+
+        if(troopers.length >= 1 || bolts.length >= 1 && player.forcePower >= 50){
+            for(let i = 0; i < troopers.length; i++){
+                if(this.container.intersectsMesh(troopers[i].npc.container)){
+                    troopers[i].npc.health = 0;
+                    troopers[i].npc.shield = 0;
+                    troopers[i].npc.causeOfDeath = 1;
+                }
+            }
+
+            for(let i = 0; i < bolts.length; i++){
+                if(this.container.intersectsMesh(bolts[i].container)){
+                    bolts[i].destroy(true, bolts, i);
+                }
+            }
+        }
+    }
+
+    pushWaveHit(player){
+        if(this.container.intersectsMesh(player.container) && player.blocking == true){
+            
+            if(player.health < 400){
+                player.health += 25;
+            }
+            return true;
+        }
+        if(this.container.intersectsMesh(player.container)){
+            if(player.shield > 0){
+                player.shield -= this.power;
+                return true;
+            }
+
+            if(player.shield == 0 && player.health > 0){
+                player.health -= this.power;
+                return true;
+            }
+        }
+    }
+
+    pushWaveDestroy(player){
+        if(this.container.position.x > 500 || this.container.position.x < 0){
+            this.container.dispose()
+            this.sprite.dispose();
+            this.spriteManager.dispose();
+            this.containerMaterial.dispose();
+            player.pushWave = {};
+            player.usingForcePush = false;
+        }
+    }
+
+}

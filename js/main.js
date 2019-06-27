@@ -7,6 +7,7 @@ window.addEventListener('DOMContentLoaded', function(){
     let gameScreen = document.getElementById('game-screen');
     let gameOverScreen = document.getElementById('game-over');
     let healthBar = document.getElementById('Health');
+    let forceBar = document.getElementById('Force');
     let timerSeconds = document.getElementById('secs');
     let timerMinutes = document.getElementById('mins');
     let seconds = 0;
@@ -38,7 +39,7 @@ window.addEventListener('DOMContentLoaded', function(){
             scene.enablePhysics();
             scene.collisionsEnabled = true;
     
-            // scene.debugLayer.show();
+            //scene.debugLayer.show();
     
             function showWorldAxis(size) {
                 var makeTextPlane = function(text, color, size) {
@@ -84,7 +85,7 @@ window.addEventListener('DOMContentLoaded', function(){
             followCamera.rotationOffset = 0;
             followCamera.cameraAcceleration = 0.5;//0.005;
             followCamera.maxCameraSpeed = 10;
-            //followCamera.attachControl(canvas, true);
+            followCamera.attachControl(canvas, true);
             
             //SKYLIGHT
             let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), scene);
@@ -127,22 +128,31 @@ window.addEventListener('DOMContentLoaded', function(){
                     trooper.matchSpritePositionToContainer();
                     let npc = new FSM(trooper);
                     troopers.push(npc);
-                    console.log(troopers);
+                    //console.log(troopers);
                 }
             }, 500);
-    
+
+            //CREATE BLASTE BOLTS
             let bolts = [];
     
             let createBolts = setInterval(()=>{
                 let boltOrDud = Math.round(Math.random()*5);
                 let randomTrooper = troopers[Math.floor(Math.random() * troopers.length)]
                 if(boltOrDud == 0 && troopers.length > 0){
-                    bolt = new Bolt(randomTrooper, "./assets/sprites/blaster-bolt.png", scene);
+                    bolt = new Bolt(50, randomTrooper.npc.container.position.x, "./assets/sprites/blaster-bolt.png", scene);
                     bolt.matchSpritePositionToContainer();
                     bolts.push(bolt);
-                    console.log('bullet made');
+                    //console.log('bullet made');
                 }
             }, 100);
+
+            //CHECK AND UPDATE FORCE
+            setInterval(()=>{
+                if(luke.forcePower < 100){
+                    luke.forcePower++;
+                    forceBar.value += 1;
+                }
+            }, 50);
     
             //REGISTER KEY INPUT EVENTS
             let inputMap = {};
@@ -207,22 +217,26 @@ window.addEventListener('DOMContentLoaded', function(){
                     luke.saberAttack(troopers);
                 }
             }));
-            // scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction({trigger: BABYLON.ActionManager.OnKeyUpTrigger, parameter: 'k'}, (evt)=>{
-            //     if(luke.health > 0){
-            //         luke.force(22, 29, false, 30);
-            //         luke.blocking = true;
-            //         setTimeout(()=>{
-            //         if(!animating){
-            //             luke.idle(4, 5, true, 50);
-            //             luke.blocking = false;
-            //         }else{
-            //             luke.run(33, 39, true, 100);
-            //             luke.blocking = false;
-            //         }
-            //         }, 200);
-            //         luke.forcePush(troopers, bolts);
-            //     }
-            // }));
+            //FORCE PUSH BIND TO KEY 'K' AND FIRE
+            scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction({trigger: BABYLON.ActionManager.OnKeyUpTrigger, parameter: 'k'}, (evt)=>{
+                if(luke.health > 0 && luke.forcePower == 100){
+                    luke.force(22, 29, false, 30);
+                    luke.blocking = true;
+                    luke.usingForcePush = true;
+                    luke.forcePower = 0;
+                    forceBar.value = 0;
+                    setTimeout(()=>{
+                        if(!animating){
+                            luke.block(4, 5, false, 50);
+                            luke.blocking = true;
+                        }else{
+                            luke.run(33, 39, true, 100);
+                            luke.blocking = false;
+                        }
+                    }, 400);
+                    luke.forcePushWaveCreate();
+                }
+            }));
     
             scene.onBeforeRenderObservable.add(()=>{
     
@@ -257,15 +271,6 @@ window.addEventListener('DOMContentLoaded', function(){
                         }
                     }
     
-                    if(inputMap["k"]){
-                        keydown=true;
-                        if(keydown == true && animating == false){
-                            luke.force(22, 29, false, 100);
-                            luke.blocking = false;
-                            animating = true;
-                        }
-                    }
-    
                     if(inputMap["m"]){
                         luke.matchSpritePositionToContainer();
                         keydown=true;
@@ -293,6 +298,12 @@ window.addEventListener('DOMContentLoaded', function(){
                         luke.container.position.x = 50;
                         luke.matchSpritePositionToContainer();
                     }
+
+                    //ANIMATE FORCE PUSH WAVE
+                    if(Object.entries(luke.pushWave).length > 0){
+                        luke.pushWave.pushWaveDirectionTrajectory(luke);
+                        luke.pushWave.pushWaveCheckCollions(troopers, bolts, luke);
+                    }
     
                     //KILL AND REMOVE STOORMTROOPERS FROM SCENE
                     troopers.forEach((trooper, i)=>{
@@ -300,7 +311,7 @@ window.addEventListener('DOMContentLoaded', function(){
                         trooper.npcMove(luke.container.position.x, random);
     
                         if(trooper.npc.health <= 0){
-                            trooper.npcDie(luke, troopers, i);
+                            trooper.npcDie(luke, troopers, i, false);
                         }
                     });
     
@@ -310,6 +321,7 @@ window.addEventListener('DOMContentLoaded', function(){
                         let hit =  bolt.hit(luke);
                         bolt.destroy(hit, bolts, i);
                     });
+
                 }else{
                     if(gameOver == false){
                         endGame();
