@@ -169,13 +169,11 @@ class Bolt{
     }
 
     boltDirectionTrajectory(player){
-            
         if(player.container.position.x < this.container.position.x){
             this.container.position.x -= 0.75;
             this.matchSpritePositionToContainer();
             return this.container.position.x;
         }
-
         if(player.container.position.x > this.container.position.x){
             this.container.position.x += 0.75;
             this.matchSpritePositionToContainer();
@@ -218,10 +216,6 @@ class Bolt{
         this.sprite.position.x = this.container.position.x;
         this.sprite.position.y = this.container.position.y;
         this.sprite.position.z = this.container.position.z;
-    }
-
-    damage(player){
-        player.health -= this.power;
     }
 }
 

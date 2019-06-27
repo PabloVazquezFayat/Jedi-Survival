@@ -85,7 +85,7 @@ window.addEventListener('DOMContentLoaded', function(){
             followCamera.rotationOffset = 0;
             followCamera.cameraAcceleration = 0.5;//0.005;
             followCamera.maxCameraSpeed = 10;
-            followCamera.attachControl(canvas, true);
+            //followCamera.attachControl(canvas, true);
             
             //SKYLIGHT
             let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), scene);
@@ -331,13 +331,6 @@ window.addEventListener('DOMContentLoaded', function(){
                     }
                 }
     
-            });
-    
-    
-            scene.onBeforeRenderObservable.add(()=>{
-                if(inputMap['w']){
-                    luke.jump();
-                }
             });
     
             return scene;
